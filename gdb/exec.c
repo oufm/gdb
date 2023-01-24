@@ -48,7 +48,10 @@
 #include "solist.h"
 #include <algorithm>
 #include "gdbsupport/pathstuff.h"
+#include "gdbsupport/common-defs.h"
 #include "cli/cli-style.h"
+#include "linux-nat.h"
+#include "auxv.h"
 
 void (*deprecated_file_changed_hook) (const char *);
 
@@ -1040,6 +1043,17 @@ exec_target::xfer_partial (enum target_object object,
 {
   struct target_section_table *table = get_section_table ();
 
+  if (inferior_ptid != null_ptid) {
+    if (object == TARGET_OBJECT_MEMORY) {
+      return linux_proc_xfer_partial (object, annex,
+                                    readbuf, writebuf,
+                                    offset, len, xfered_len);
+    } else if (object == TARGET_OBJECT_AUXV) {
+      return memory_xfer_auxv (this, object, annex, readbuf, writebuf,
+            offset, len, xfered_len);
+    }
+  }
+
   if (object == TARGET_OBJECT_MEMORY)
     return section_table_xfer_memory_partial (readbuf, writebuf,
 					      offset, len, xfered_len,
@@ -1199,6 +1213,10 @@ exec_set_section_address (const char *filename, int index, CORE_ADDR address)
 bool
 exec_target::has_memory ()
 {
+  if (inferior_ptid != null_ptid) {
+    return true;
+  }
+
   /* We can provide memory if we have any file/target sections to read
      from.  */
   return (current_target_sections->sections

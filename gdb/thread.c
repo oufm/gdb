@@ -242,7 +242,7 @@ init_thread_list (void)
 /* Allocate a new thread of inferior INF with target id PTID and add
    it to the thread list.  */
 
-static struct thread_info *
+struct thread_info *
 new_thread (struct inferior *inf, ptid_t ptid)
 {
   thread_info *tp = new thread_info (inf, ptid);

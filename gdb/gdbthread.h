@@ -417,6 +417,8 @@ extern struct thread_info *add_thread (process_stratum_target *targ,
 extern struct thread_info *add_thread_silent (process_stratum_target *targ,
 					      ptid_t ptid);
 
+extern struct thread_info *new_thread (struct inferior *inf, ptid_t ptid);
+
 /* Same as add_thread, and sets the private info.  */
 extern struct thread_info *add_thread_with_info (process_stratum_target *targ,
 						 ptid_t ptid,

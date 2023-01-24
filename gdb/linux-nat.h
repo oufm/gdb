@@ -331,4 +331,10 @@ void linux_nat_switch_fork (ptid_t new_ptid);
    uninitialized in such case).  */
 int linux_nat_get_siginfo (ptid_t ptid, siginfo_t *siginfo);
 
+enum target_xfer_status
+linux_proc_xfer_partial (enum target_object object,
+			 const char *annex, gdb_byte *readbuf,
+			 const gdb_byte *writebuf,
+			 ULONGEST offset, LONGEST len, ULONGEST *xfered_len);
+
 #endif /* LINUX_NAT_H */

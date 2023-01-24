@@ -3688,12 +3688,6 @@ linux_nat_xfer_osdata (enum target_object object,
 		       const gdb_byte *writebuf, ULONGEST offset, ULONGEST len,
 		       ULONGEST *xfered_len);
 
-static enum target_xfer_status
-linux_proc_xfer_partial (enum target_object object,
-			 const char *annex, gdb_byte *readbuf,
-			 const gdb_byte *writebuf,
-			 ULONGEST offset, LONGEST len, ULONGEST *xfered_len);
-
 enum target_xfer_status
 linux_nat_target::xfer_partial (enum target_object object,
 				const char *annex, gdb_byte *readbuf,
@@ -3806,7 +3800,7 @@ linux_nat_target::pid_to_exec_file (int pid)
    Because we can use a single read/write call, this can be much more
    efficient than banging away at PTRACE_PEEKTEXT.  */
 
-static enum target_xfer_status
+enum target_xfer_status
 linux_proc_xfer_partial (enum target_object object,
 			 const char *annex, gdb_byte *readbuf,
 			 const gdb_byte *writebuf,
@@ -3819,9 +3813,11 @@ linux_proc_xfer_partial (enum target_object object,
   if (object != TARGET_OBJECT_MEMORY)
     return TARGET_XFER_EOF;
 
+#if 0
   /* Don't bother for one word.  */
   if (len < 3 * sizeof (long))
     return TARGET_XFER_EOF;
+#endif
 
   /* We could keep this file open and cache it - possibly one per
      thread.  That requires some juggling, but is even faster.  */

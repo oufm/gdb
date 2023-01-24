@@ -53,7 +53,9 @@
 #include "gdbtk/generic/gdbtk.h"
 #endif
 #include "gdbsupport/alt-stack.h"
+#include "gdbsupport/common-defs.h"
 #include "observable.h"
+#include "solib.h"
 
 /* The selected interpreter.  This will be used as a set command
    variable, so it should always be malloc'ed - since
@@ -542,6 +544,7 @@ captured_main_1 (struct captured_main_args *context)
   char *pid_or_core_arg = NULL;
   char *cdarg = NULL;
   char *ttyarg = NULL;
+  char *mem_pid = NULL;
 
   /* These are static so that we can take their address in an
      initializer.  */
@@ -738,6 +741,8 @@ captured_main_1 (struct captured_main_args *context)
       {"args", no_argument, &set_args, 1},
       {"l", required_argument, 0, 'l'},
       {"return-child-result", no_argument, &return_child_result, 1},
+      {"m", required_argument, 0, 'm'},
+      {"mem-pid", required_argument, 0, 'm'},
       {0, no_argument, 0, 0}
     };
 
@@ -864,6 +869,9 @@ captured_main_1 (struct captured_main_args *context)
 	    break;
 	  case 't':
 	    ttyarg = optarg;
+	    break;
+	  case 'm':
+	    mem_pid = optarg;
 	    break;
 	  case 'q':
 	    quiet = 1;
@@ -1122,6 +1130,19 @@ captured_main_1 (struct captured_main_args *context)
       if (ret != 0)
 	ret = catch_command_errors (symbol_file_add_main_adapter,
 				    symarg, !batch_flag);
+
+      if (mem_pid) {
+        int pid = parse_pid_to_attach (mem_pid);
+
+        inferior_ptid = ptid_t(pid, pid, pid);
+        inferior_appeared (current_inferior (), pid);
+
+        thread_info *thread = new_thread (current_inferior (), inferior_ptid);
+        gdb::observers::new_thread.notify (thread);
+        switch_to_thread (thread);
+
+        solib_create_inferior_hook (false);
+      }
     }
   else
     {
@@ -1305,6 +1326,7 @@ Selection of debuggee and its files:\n\n\
   --core=COREFILE    Analyze the core dump COREFILE.\n\
   --exec=EXECFILE    Use EXECFILE as the executable.\n\
   --pid=PID          Attach to running process PID.\n\
+  -m,--mem-pid=PID   Read memory from running process PID.\n\
   --directory=DIR    Search for source files in DIR.\n\
   --se=FILE          Use FILE as symbol file and executable file.\n\
   --symbols=SYMFILE  Read symbols from SYMFILE.\n\
