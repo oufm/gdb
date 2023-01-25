@@ -149,6 +149,10 @@ bool may_insert_fast_tracepoints = true;
 
 bool may_stop = true;
 
+bool may_run = true;
+
+bool may_attach = true;
+
 /* Non-zero if we want to see trace of target level stuff.  */
 
 static unsigned int targetdebug = 0;

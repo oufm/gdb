@@ -742,8 +742,9 @@ captured_main_1 (struct captured_main_args *context)
       {"args", no_argument, &set_args, 1},
       {"l", required_argument, 0, 'l'},
       {"return-child-result", no_argument, &return_child_result, 1},
+      {"mem-pid", required_argument, 0, 'M'},
+      {"M", required_argument, 0, 'M'},
       {"m", required_argument, 0, 'm'},
-      {"mem-pid", required_argument, 0, 'm'},
       {0, no_argument, 0, 0}
     };
 
@@ -872,6 +873,11 @@ captured_main_1 (struct captured_main_args *context)
 	    ttyarg = optarg;
 	    break;
 	  case 'm':
+            may_write_memory = false;
+            may_run = false;
+            may_attach = false;
+            /* fall through */
+	  case 'M':
 	    mem_pid = parse_pid_to_attach (optarg);
 	    break;
 	  case 'q':
@@ -1330,7 +1336,8 @@ Selection of debuggee and its files:\n\n\
   --core=COREFILE    Analyze the core dump COREFILE.\n\
   --exec=EXECFILE    Use EXECFILE as the executable.\n\
   --pid=PID          Attach to running process PID.\n\
-  -m,--mem-pid=PID   Read memory from running process PID.\n\
+  -M,--mem-pid=PID   Read memory from running process PID.\n\
+  -m=PID             Like '-M', but also set readonly.\n\
   --directory=DIR    Search for source files in DIR.\n\
   --se=FILE          Use FILE as symbol file and executable file.\n\
   --symbols=SYMFILE  Read symbols from SYMFILE.\n\

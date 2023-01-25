@@ -419,6 +419,11 @@ run_command_1 (const char *args, int from_tty, enum run_how run_how)
 
   dont_repeat ();
 
+  if (!may_run)
+    {
+      error (_("Running is not allowed."));
+    }
+
   kill_if_already_running (from_tty);
 
   init_wait_for_inferior ();
@@ -2564,6 +2569,11 @@ attach_command (const char *args, int from_tty)
   enum attach_post_wait_mode mode;
 
   dont_repeat ();		/* Not for the faint of heart */
+
+  if (!may_attach)
+    {
+      error (_("Attaching is not allowed."));
+    }
 
   if (gdbarch_has_global_solist (target_gdbarch ()))
     /* Don't complain if all processes share the same symbol

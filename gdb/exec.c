@@ -84,6 +84,7 @@ struct exec_target final : public target_ops
   bool has_memory () override;
   char *make_corefile_notes (bfd *, int *) override;
   int find_memory_regions (find_memory_region_ftype func, void *data) override;
+  bool has_all_memory () override { return inferior_ptid != null_ptid; }
 };
 
 static exec_target exec_ops;
