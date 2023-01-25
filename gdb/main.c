@@ -56,6 +56,7 @@
 #include "gdbsupport/common-defs.h"
 #include "observable.h"
 #include "solib.h"
+#include "nat/linux-procfs.h"
 
 /* The selected interpreter.  This will be used as a set command
    variable, so it should always be malloc'ed - since
@@ -544,7 +545,7 @@ captured_main_1 (struct captured_main_args *context)
   char *pid_or_core_arg = NULL;
   char *cdarg = NULL;
   char *ttyarg = NULL;
-  char *mem_pid = NULL;
+  int mem_pid = 0;
 
   /* These are static so that we can take their address in an
      initializer.  */
@@ -871,7 +872,7 @@ captured_main_1 (struct captured_main_args *context)
 	    ttyarg = optarg;
 	    break;
 	  case 'm':
-	    mem_pid = optarg;
+	    mem_pid = parse_pid_to_attach (optarg);
 	    break;
 	  case 'q':
 	    quiet = 1;
@@ -1118,6 +1119,11 @@ captured_main_1 (struct captured_main_args *context)
   save_auto_load = global_auto_load;
   global_auto_load = 0;
 
+  if (execarg == NULL && symarg == NULL && mem_pid) {
+    execarg = linux_proc_pid_to_exec_file (mem_pid);
+    symarg = execarg;
+  }
+
   if (execarg != NULL
       && symarg != NULL
       && strcmp (execarg, symarg) == 0)
@@ -1132,10 +1138,8 @@ captured_main_1 (struct captured_main_args *context)
 				    symarg, !batch_flag);
 
       if (mem_pid) {
-        int pid = parse_pid_to_attach (mem_pid);
-
-        inferior_ptid = ptid_t(pid, pid, pid);
-        inferior_appeared (current_inferior (), pid);
+        inferior_ptid = ptid_t(mem_pid, mem_pid, mem_pid);
+        inferior_appeared (current_inferior (), mem_pid);
 
         thread_info *thread = new_thread (current_inferior (), inferior_ptid);
         gdb::observers::new_thread.notify (thread);
