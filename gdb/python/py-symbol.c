@@ -395,7 +395,9 @@ gdbpy_lookup_symbol (PyObject *self, PyObject *args, PyObject *kw)
 	}
       catch (const gdb_exception &except)
 	{
+#if 0     /* Global vars don't need block */
 	  GDB_PY_HANDLE_EXCEPTION (except);
+#endif
 	}
     }
 
