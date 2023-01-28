@@ -1,3 +1,29 @@
+## Why modify gdb?
+
+Using the original gdb to print variables in a running process requires first attaching, and attaching will interrupt the running process.
+
+This can cause some problems, such as:
+* Causing the process to run differently, making the problem unable to reproduce.
+* May affect related business and is typically not allowed in production environments.
+
+In fact, it is not necessary to attach to a process in order to obtain the value of global variables. By reading the `/proc/PID/mem` file, it is possible to obtain sufficient information.
+
+Therefore, I have modified gdb so that it can print the value of global variables without interrupting the process.
+
+## How to use the new feature?
+
+Just execute `gdb -m <PID>`.
+This operation will not attach the process. You can use the `p` and `x` commands to print global variables.
+
+When specifying the `-m` parameter, modification of variable values (`set var = value`) and `attach` and `run` commands are prohibited to avoid misoperations.
+
+If you really want to modify global variable values, you can use the `-M` parameter, but it is not recommended in a production environment.
+
+
+The following is the original README.
+
+---
+
 		   README for GNU development tools
 
 This directory contains various GNU compilers, assemblers, linkers, 
