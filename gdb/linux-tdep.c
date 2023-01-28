@@ -2317,7 +2317,7 @@ linux_vsyscall_range_raw (struct gdbarch *gdbarch, struct mem_range *range)
   /* It doesn't make sense to access the host's /proc when debugging a
      core file.  Instead, look for the PT_LOAD segment that matches
      the vDSO.  */
-  if (!target_has_execution)
+  if (!target_has_memory)
     {
       long phdrs_size;
       int num_phdrs, i;
